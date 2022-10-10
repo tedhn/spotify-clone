@@ -1,0 +1,71 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@font-face {
+  font-family: spotify-font;
+  src: url('./fonts/GothamBook.ttf');
+}
+
+@font-face {
+  font-family: spotify-font;
+  src: url('./fonts/Gotham-Black.otf');
+  font-weight: 900;
+}
+
+@font-face {
+  font-family: spotify-font;
+  src: url('./fonts/Gotham-Bold.otf');
+  font-weight: 700;
+}
+
+@font-face {
+  font-family: spotify-font;
+  src: url('./fonts/GothamMedium.ttf');
+  font-weight: 500;
+}
+
+@font-face {
+  font-family: spotify-font;
+  src: url('./fonts/Gotham-Light.otf');
+  font-weight: 300;
+}
+
+@font-face {
+  font-family: spotify-font;
+  src: url('./fonts/Gotham-Thin.otf');
+  font-weight: 100;
+}
+
+
+:root {
+  font-family: spotify-font, sans-serif;
+  font-size: 16px;
+  line-height: 24px;
+  font-weight: bold;
+
+  color-scheme: light dark;
+  color: white;
+  background-color: #212121;
+
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  -webkit-text-size-adjust: 100%;
+}
+
+* {
+  padding: 0;
+  margin: 0;
+  box-sizing: border-box;
+  user-select: none;
+}
+
+svg {
+  height: 24px;
+  width: 24px;
+  margin: auto 0;
+
+
+}
