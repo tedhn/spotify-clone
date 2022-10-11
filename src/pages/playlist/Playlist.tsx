@@ -1,5 +1,4 @@
-import axios from "axios";
-import React, { useEffect, useRef, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
 import { useParams } from "react-router-dom";
 import InfiniteScroll from "react-infinite-scroll-component";
@@ -9,16 +8,18 @@ import { Banner, Listitem, Options, ContextMenu, Heart } from "@/components";
 import { convertDate, convertDuration } from "@/utils";
 import { SongType } from "@/types";
 import useContextMenu from "@/useContextMenu";
+import { checkSaved, getPlaylistData, getPlaylistTracks } from "@/api";
 
 const Playlist = () => {
 	const params = useParams();
-
 	const {
 		playlistRef,
 		isShowMenu,
 		anchorPoints,
 		selectedURI,
+		selectedID,
 		setSelectedURI,
+		setSelectedID,
 		toggleContextMenu,
 	} = useContextMenu();
 
@@ -66,50 +67,25 @@ const Playlist = () => {
 	};
 
 	const getMoreSongs = async () => {
-		const { data } = await axios.post(
-			"http://localhost:3001/getPlaylistTracks",
-			{ playlistId: params.id, offset: current.tracks.length }
-		);
+		const tracks = await getPlaylistTracks(params.id!, current.tracks.length);
 
-		const isSavedList = await checkSaved(data.tracks);
+		const isSavedList = await checkSaved(tracks);
 
 		setCurrent({
 			...current,
-			tracks: [...current.tracks, ...data.tracks],
+			tracks: [...current.tracks, ...tracks],
 			isSavedList: [...current.isSavedList, ...isSavedList],
 		});
-	};
-
-	const checkSaved = async (tracks: Array<SongType>) => {
-		const idList = tracks.map((track) => track.track.id);
-
-		const { data } = await axios.post("http://localhost:3001/checkTracks", {
-			idList: idList,
-		});
-
-		return data;
-	};
-
-	const getPlaylistData = async (userId: string, playlistId: string) => {
-		const { data } = await axios.post(
-			"http://localhost:3001/getPlaylistPageData",
-			{
-				playlistId: playlistId,
-				userId: userId,
-			}
-		);
-
-		return {
-			playlistData: data.playlistData,
-			userImage: data.userImage,
-			tracks: data.tracks,
-		};
 	};
 
 	return (
 		<div className='col-span-10' id='scrollableDiv'>
 			{isShowMenu && (
-				<ContextMenu anchorPoints={anchorPoints} uri={selectedURI} />
+				<ContextMenu
+					anchorPoints={anchorPoints}
+					uri={selectedURI}
+					songID={selectedID}
+				/>
 			)}
 
 			<Banner
@@ -217,6 +193,7 @@ const Playlist = () => {
 													className='flex flex-col items-center justify-center relative'
 													ref={optionRef}
 													onClick={(e: any) => {
+														setSelectedID(track.id);
 														setSelectedURI(track.uri);
 														toggleContextMenu(e, menuRef, optionRef);
 													}}>

@@ -5,6 +5,7 @@ import { useNavigate } from "react-router-dom";
 import { Listitem, Card, ContextMenu } from "@/components";
 import { convertDuration } from "@/utils";
 import useContextMenu from "@/useContextMenu";
+import { search } from "@/api";
 
 const Search = () => {
 	const navigate = useNavigate();
@@ -24,19 +25,18 @@ const Search = () => {
 		isShowMenu,
 		anchorPoints,
 		selectedURI,
+		selectedID,
 		setSelectedURI,
+		setSelectedID,
 		toggleContextMenu,
 	} = useContextMenu();
 
 	useEffect(() => {
 		const getData = setTimeout(async () => {
-			console.log("finding song" + query);
+			console.log("finding song " + query);
 
 			if (query !== "") {
-				const { data } = await axios.post("http://localhost:3001/search", {
-					q: query,
-				});
-
+				const data = await search(query);
 				const { tracks, albums, playlists, artists, episodes, shows } = data;
 
 				setSearchResutls({
@@ -70,7 +70,11 @@ const Search = () => {
 				className='mt-4 px-2 py-1 rounded-lg'
 			/>
 			{isShowMenu && (
-				<ContextMenu anchorPoints={anchorPoints} uri={selectedURI} />
+				<ContextMenu
+					anchorPoints={anchorPoints}
+					uri={selectedURI}
+					songID={selectedID}
+				/>
 			)}
 
 			{query && (
@@ -84,6 +88,7 @@ const Search = () => {
 									key={result.id}
 									uri={result.uri}
 									render={(
+										isHover: boolean,
 										menuRef: any,
 										optionRef: any,
 										setIsHover: React.Dispatch<React.SetStateAction<boolean>>
@@ -123,6 +128,7 @@ const Search = () => {
 												className='flex flex-col items-center justify-center relative'
 												ref={optionRef}
 												onClick={(e: any) => {
+													setSelectedID(result.id);
 													setSelectedURI(result.uri);
 													toggleContextMenu(e, menuRef, optionRef);
 												}}>

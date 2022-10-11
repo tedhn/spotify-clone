@@ -2,50 +2,41 @@ import axios from "axios";
 import { FC } from "react";
 import { useDispatch } from "react-redux";
 import { updatePlaylist } from "@/Slices/playlistSlice";
+import { addToPlaylist, removeFromSavedTracks } from "@/api";
 
 interface PropTypes {
 	anchorPoints: { x: number; y: number };
 	uri: string;
 	songID: string;
-	// setShowMenu: React.Dispatch<React.SetStateAction<boolean>>;
-	menu: Array<{ label: string; action: string }>;
-	handlers: any;
 }
+
+const menuOptions = [
+	{ label: "Go to song radio", action: "goToRadio" },
+	{ label: "Go to artist", action: "goToArtist" },
+	{ label: "Go to album", action: "goToablum" },
+	{ label: "Remove from liked songs", action: "removeSongFromSaveTracks" },
+	{ label: "Add to playlist", action: "addToPlaylist" },
+];
 
 const ContextMenu: FC<PropTypes> = ({
 	anchorPoints: { x, y },
 	uri,
 	songID,
-	menu,
-	handlers,
 	// setShowMenu,
 }) => {
 	const dispatch = useDispatch();
 
-	const handleAddToPlaylist = async () => {
-		axios.post("http://localhost:3001/addToPlaylist", {
-			playlistId: "3cSpNwEM2C4GMrggDLSDhD",
-			song: uri,
-		});
-
-		const { data } = await axios.get("http://localhost:3001/playlist");
-
-		dispatch(updatePlaylist(data.items));
-	};
-
 	const handleClick = (choice: string) => {
 		switch (choice) {
 			case "addToPlaylist": {
-				handleAddToPlaylist();
+				addToPlaylist(uri);
 				break;
 			}
-			case "removeSong": {
-				console.log("removing song :" + songID);
-				handlers.remove(songID);
-				// handleRemoveSong(songID);
+			case "removeSongFromSaveTracks": {
+				console.log("removing song to Saved Tracka :" + songID);
+				removeFromSavedTracks(songID);
 				break;
 			}
-
 			default: {
 				break;
 			}
@@ -59,8 +50,9 @@ const ContextMenu: FC<PropTypes> = ({
 				top: y,
 				right: x,
 			}}>
-			{menu.map((item) => (
+			{menuOptions.map((item) => (
 				<div
+					key={item.label}
 					className='hover:bg-lightgrey/30 px-2 py-1 text-white'
 					onClick={() => handleClick(item.action)}>
 					{item.label}

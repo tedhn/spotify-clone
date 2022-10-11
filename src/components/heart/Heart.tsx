@@ -1,3 +1,4 @@
+import { addToSavedTracks, removeFromSavedTracks } from "@/api";
 import axios from "axios";
 import React, { FC, useState } from "react";
 
@@ -13,24 +14,10 @@ const Heart: FC<PropTypes> = ({ isSaved, isHover, id }) => {
 	const handleSaveTracks = async () => {
 		if (toggleSaved) {
 			console.log("removing ");
-			const { data } = await axios.post(
-				"http://localhost:3001/removeFromMySavedTracks",
-				{
-					id: id,
-				}
-			);
-
-			console.log(data);
+			await removeFromSavedTracks(id);
 		} else {
 			console.log("adding");
-      			const { data } = await axios.post(
-							"http://localhost:3001/addToMySavedTracks",
-							{
-								id: id,
-							}
-						);
-
-						console.log(data);
+			await addToSavedTracks(id);
 		}
 
 		setToggle(!toggleSaved);

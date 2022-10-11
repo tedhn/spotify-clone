@@ -10,6 +10,7 @@ import { RootState } from "@/store";
 import { SongType } from "@/types";
 import { convertDate, convertDuration } from "@/utils";
 import useContextMenu from "@/useContextMenu";
+import { removeFromSavedTracks } from "@/api";
 
 const SavedSongs = () => {
 	const dispatch = useDispatch();
@@ -47,36 +48,6 @@ const SavedSongs = () => {
 		);
 	};
 
-	const handleRemoveSong = async (id: string) => {
-		// const newTracks = [...tracks];
-
-		const { data } = await axios.post(
-			"http://localhost:3001/removeFromMySavedTracks",
-			{
-				id: id,
-			}
-		);
-		const newTracks = tracks.filter((track: any) => track.track.id !== id);
-
-		// newTracks.splice(
-		// 	newTracks.indexOf((track) => track.id === id),
-		// 	1
-		// );
-		setTracks(newTracks);
-		setTotal(totalTracks - 1);
-	};
-
-	const menu = [
-		{ label: "Go to song radio", action: "goToRadio" },
-		{ label: "Go to artist", action: "goToArtist" },
-		{ label: "Go to album", action: "goToablum" },
-		{ label: "Remove from liked songs", action: "removeSong" },
-		{ label: "Add to playlist", action: "addToPlaylist" },
-	];
-
-	const handler = {
-		remove: handleRemoveSong,
-	};
 
 	return (
 		<div className='col-span-10'>
@@ -85,8 +56,6 @@ const SavedSongs = () => {
 					anchorPoints={anchorPoints}
 					uri={selectedURI}
 					songID={selectedID}
-					menu={menu}
-					handlers={handler}
 				/>
 			)}
 

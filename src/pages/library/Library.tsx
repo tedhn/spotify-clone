@@ -7,6 +7,7 @@ import { useNavigate } from "react-router-dom";
 import axios from "axios";
 
 import { setSavedTracks } from "@/Slices/savedTracksSlice";
+import { getSavedTracks } from "@/api";
 
 const Library = () => {
 	const navigate = useNavigate();
@@ -24,9 +25,7 @@ const Library = () => {
 	}, []);
 
 	const onLoad = async () => {
-		const { data } = await axios.post("http://localhost:3001/savedTracks", {
-			offset: tracks.length,
-		});
+		const data = await getSavedTracks(tracks.length);
 
 		dispatch(setSavedTracks({ total: data.total, tracks: data.items }));
 	};
