@@ -32,8 +32,11 @@ const useContextMenu = () => {
 	};
 
 	useEffect(() => {
+
+		console.log(playlistRef)
+
 		const handleOutsideClick = (e: any) => {
-			if (!playlistRef?.current.contains(e.target)) {
+			if (!playlistRef.current?.contains(e.target)) {
 				setShowMenu(false);
 			}
 		};

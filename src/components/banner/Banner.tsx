@@ -23,6 +23,7 @@ const Banner: FC<PropsTypes> = (props) => {
 		username,
 	} = props;
 
+
 	return (
 		<div className='w-full flex justify-start items-end gap-10 px-8 py-4 mt-4'>
 			{image}
@@ -49,9 +50,9 @@ const Banner: FC<PropsTypes> = (props) => {
 							alt='user-image'
 						/>
 					) : null}
-					<div data-testid='banner-id'>{username}</div>.
+					<div data-testid='banner-id'>{username}</div>
 					{followers !== undefined ? 
-				(	<div data-testid='banner-id'>{followers} likes.</div>) : null}
+				(	<div data-testid='banner-id'>{followers} likes</div>) : null}
 					<div data-testid='banner-id'>{totalTracks} songs</div>
 				</div>
 			</div>

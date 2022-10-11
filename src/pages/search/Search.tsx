@@ -53,10 +53,6 @@ const Search = () => {
 		return () => clearTimeout(getData);
 	}, [query]);
 
-	useEffect(() => {
-		console.log(searchResults);
-	}, [searchResults]);
-
 	return (
 		<div className='col-span-10 px-8 py-12'>
 			<div className='text-4xl font-bold'>Search</div>
@@ -69,17 +65,16 @@ const Search = () => {
 				onChange={(e) => setQuery(e.target.value)}
 				className='mt-4 px-2 py-1 rounded-lg'
 			/>
-			{isShowMenu && (
-				<ContextMenu
-					anchorPoints={anchorPoints}
-					uri={selectedURI}
-					songID={selectedID}
-				/>
-			)}
 
 			{query && (
 				<>
-					{" "}
+					{isShowMenu && (
+						<ContextMenu
+							anchorPoints={anchorPoints}
+							uri={selectedURI}
+							songID={selectedID}
+						/>
+					)}
 					<div className='my-4 text-2xl'>Songs</div>
 					<ul className='mt-8' ref={playlistRef}>
 						{searchResults.tracks.map((result: any, index: number) => {

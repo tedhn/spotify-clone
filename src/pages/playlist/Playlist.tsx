@@ -8,7 +8,7 @@ import { Banner, Listitem, Options, ContextMenu, Heart } from "@/components";
 import { convertDate, convertDuration } from "@/utils";
 import { SongType } from "@/types";
 import useContextMenu from "@/useContextMenu";
-import { checkSaved, getPlaylistData, getPlaylistTracks } from "@/api";
+import { checkSaved, getPlaylistData, getPlaylistTracks, getUser } from "@/api";
 
 const Playlist = () => {
 	const params = useParams();
@@ -45,10 +45,17 @@ const Playlist = () => {
 	}, [params.id]);
 
 	const onLoad = async () => {
-		const { tracks, playlistData, userImage } = await getPlaylistData(
-			playlist.owner.id,
-			params.id!
-		);
+		// const { tracks, playlistData, userImage } = await getPlaylistData(
+		// 	playlist.owner.id,
+		// 	params.id!
+		// );
+
+		const playlistData = await getPlaylistData(params.id!);
+
+		const user = await getUser(playlistData.owner.id);
+
+		const tracks = await getPlaylistTracks(params.id!, current.tracks.lenght);
+
 		const isSavedList = await checkSaved(tracks);
 
 		setCurrent({
@@ -59,8 +66,8 @@ const Playlist = () => {
 			description: playlistData.description,
 			title: playlistData.name,
 			username: playlistData.owner.display_name,
-			followers: playlistData.dataFollowers,
-			userImage: userImage[0]?.url,
+			followers: playlistData.followers.total,
+			userImage: user.images[0]?.url,
 			tracks: tracks,
 			isSavedList: isSavedList,
 		});
@@ -128,6 +135,8 @@ const Playlist = () => {
 						</svg>
 					</div>
 				</div>
+
+
 				<InfiniteScroll
 					dataLength={current.tracks}
 					next={getMoreSongs}

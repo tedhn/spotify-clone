@@ -18,6 +18,7 @@ export const savedTracksSlice = createSlice({
 		setSavedTracks: (state: savedTracksSliceType, action: any) => {
 			const { payload } = action;
 
+			
 			state.tracks = payload.tracks;
 			state.total = payload.total;
 		},
