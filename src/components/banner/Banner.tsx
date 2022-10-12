@@ -1,14 +1,15 @@
 import { FC } from "react";
 
 interface PropsTypes {
-	image: any;
+	image?: any;
 	type: any;
 	followers?: number;
-	totalTracks: number;
+	totalTracks?: number;
 	description?: string;
 	title: string;
 	userImage?: string;
-	username: string;
+	username?: string;
+	backgroundImage?: string;
 }
 
 const Banner: FC<PropsTypes> = (props) => {
@@ -20,11 +21,12 @@ const Banner: FC<PropsTypes> = (props) => {
 		description,
 		title,
 		userImage,
-		username,
+		username = "",
+		backgroundImage = "",
 	} = props;
 
 	return (
-		<div className='w-full flex justify-start items-end gap-10 px-8 py-4 mt-4'>
+		<div className='col-span-10 flex justify-start items-end gap-10 px-8 py-4 mt-4'>
 			{image}
 
 			<div className='flex gap-4 flex-col'>
@@ -47,11 +49,15 @@ const Banner: FC<PropsTypes> = (props) => {
 							alt='user-image'
 						/>
 					) : null}
-					<div data-testid='banner-id'>{username}</div>
+					{username !== "" ? (
+						<div data-testid='banner-id'>{username}</div>
+					) : null}
 					{followers !== undefined ? (
 						<div data-testid='banner-id'>{followers} likes</div>
 					) : null}
-					<div data-testid='banner-id'>{totalTracks} songs</div>
+					{totalTracks !== undefined ? (
+						<div data-testid='banner-id'>{totalTracks} songs</div>
+					) : null}
 				</div>
 			</div>
 		</div>

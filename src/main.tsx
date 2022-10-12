@@ -15,3 +15,5 @@ ReactDOM.createRoot(document.getElementById("root") as HTMLElement).render(
 );
 
 //TODO update locally stored playlist on adding to playlist
+// TODO ADD PLAYLIST PAGE 
+// TODO FIX CONTEXT MENU

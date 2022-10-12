@@ -104,3 +104,29 @@ export const getAlbumsTracks = async (id: string, offset: number) => {
 
 	return data;
 };
+
+
+// ARTIST APIS
+
+export const getArtistTopTracks = async (id: string) => {
+	const { data } = await axios.post(BASE_API_URL + "/getArtistTopTracks", {
+		id,
+		market : "SG"
+	});
+
+	return data;
+};
+export const getArtistAlbums = async (id: string) => {
+	const { data } = await axios.post(BASE_API_URL + "/getArtistAlbums", {
+		id,
+	});
+
+	return data;
+};
+export const getArtistRelatedArtists = async (id: string) => {
+	const { data } = await axios.post(BASE_API_URL + "/getArtistRelatedArtists", {
+		id,
+	});
+
+	return data;
+};
