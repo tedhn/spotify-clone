@@ -54,9 +54,11 @@ const Playlist = () => {
 
 		const user = await getUser(playlistData.owner.id);
 
-		const tracks = await getPlaylistTracks(params.id!, current.tracks.lenght);
+		const tracks = await getPlaylistTracks(params.id!, current.tracks.length);
 
-		const isSavedList = await checkSaved(tracks);
+		const isSavedList = await checkSaved(
+			tracks.map((track: any) => track.track.id)
+		);
 
 		setCurrent({
 			...current,
@@ -104,7 +106,11 @@ const Playlist = () => {
 						className='object-cover w-64 h-64 '
 					/>
 				}
-				isPublic={current.isPublic}
+				type={
+					<div data-testid='banner-id' className='font-bold uppercase text-xs'>
+						{current.isPublic ? "public playlist" : "private playlist"} 
+					</div>
+				}
 				totalTracks={current.totalTracks}
 				description={current.description}
 				title={current.title}
@@ -135,7 +141,6 @@ const Playlist = () => {
 						</svg>
 					</div>
 				</div>
-
 
 				<InfiniteScroll
 					dataLength={current.tracks}

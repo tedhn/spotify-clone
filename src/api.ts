@@ -5,11 +5,9 @@ const BASE_API_URL = "http://localhost:3001";
 
 // GENERAL API
 
-export const checkSaved = async (tracks: Array<SongType>) => {
-	const idList = tracks.map((track) => track.track.id);
-
+export const checkSaved = async (tracks: Array<string>) => {
 	const { data } = await axios.post(BASE_API_URL + "/checkTracks", {
-		idList: idList,
+		idList: tracks,
 	});
 
 	return data;
@@ -18,6 +16,13 @@ export const checkSaved = async (tracks: Array<SongType>) => {
 export const getUser = async (userId: string) => {
 	const { data } = await axios.post(BASE_API_URL + "/getUser", {
 		userId,
+	});
+
+	return data;
+};
+export const getArtist = async (artistId: string) => {
+	const { data } = await axios.post(BASE_API_URL + "/getArtist", {
+		artistId,
 	});
 
 	return data;
@@ -89,8 +94,6 @@ export const getAlbums = async (id: string) => {
 		id,
 	});
 
-	console.log(data);
-
 	return data;
 };
 export const getAlbumsTracks = async (id: string, offset: number) => {
@@ -98,8 +101,6 @@ export const getAlbumsTracks = async (id: string, offset: number) => {
 		id,
 		offset,
 	});
-
-	console.log(data);
 
 	return data;
 };

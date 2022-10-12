@@ -2,10 +2,10 @@ import axios from "axios";
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 
-import { Listitem, Card, ContextMenu } from "@/components";
+import { Listitem, Card, ContextMenu, Heart } from "@/components";
 import { convertDuration } from "@/utils";
 import useContextMenu from "@/useContextMenu";
-import { search } from "@/api";
+import { checkSaved, search } from "@/api";
 
 const Search = () => {
 	const navigate = useNavigate();
@@ -19,6 +19,8 @@ const Search = () => {
 		artists: [],
 		episodes: [],
 	});
+
+	const [isSavedList, setSavedList] = useState<Array<boolean>>([]);
 
 	const {
 		playlistRef,
@@ -39,6 +41,11 @@ const Search = () => {
 				const data = await search(query);
 				const { tracks, albums, playlists, artists, episodes, shows } = data;
 
+				const savedArr = await checkSaved(
+					tracks.items.map((track: any) => track.id)
+				);
+
+				setSavedList(savedArr);
 				setSearchResutls({
 					tracks: tracks.items,
 					albums: albums.items,
@@ -101,7 +108,7 @@ const Search = () => {
 												alt='result-image'
 												data-testid='listitem-id'
 											/>
-											<div className='col-span-5'>
+											<div className='col-span-4'>
 												<div
 													className='text-sm text-white '
 													data-testid='listitem-id'>
@@ -115,6 +122,11 @@ const Search = () => {
 											<div className='col-span-3' data-testid='listitem-id'>
 												{result.album.name}
 											</div>
+											<Heart
+												isSaved={isSavedList[index]}
+												isHover={isHover}
+												id={result.id}
+											/>
 											<div className='text-center' data-testid='listitem-id'>
 												{convertDuration(result.duration_ms)}
 											</div>
@@ -171,7 +183,7 @@ const Search = () => {
 							);
 						})}
 					</ul>
-					<div className='my-4 text-2xl'>Shows</div>
+					{/* <div className='my-4 text-2xl'>Shows</div>
 					<ul className='flex flex-wrap justify-around items-center mt-6'>
 						{searchResults.shows.map((result: any) => {
 							return (
@@ -186,7 +198,7 @@ const Search = () => {
 								<Card result={result} key={result.id} subtitle={result.type} />
 							);
 						})}
-					</ul>
+					</ul> */}
 				</>
 			)}
 		</div>

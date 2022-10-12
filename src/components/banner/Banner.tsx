@@ -2,7 +2,7 @@ import { FC } from "react";
 
 interface PropsTypes {
 	image: any;
-	isPublic: boolean;
+	type: any;
 	followers?: number;
 	totalTracks: number;
 	description?: string;
@@ -14,7 +14,7 @@ interface PropsTypes {
 const Banner: FC<PropsTypes> = (props) => {
 	const {
 		image,
-		isPublic,
+		type,
 		followers = undefined,
 		totalTracks,
 		description,
@@ -23,15 +23,12 @@ const Banner: FC<PropsTypes> = (props) => {
 		username,
 	} = props;
 
-
 	return (
 		<div className='w-full flex justify-start items-end gap-10 px-8 py-4 mt-4'>
 			{image}
 
 			<div className='flex gap-4 flex-col'>
-				<div data-testid='banner-id' className='font-bold uppercase text-xs'>
-					{isPublic ? "public" : "private"} playlist
-				</div>
+				{type}
 				<div data-testid='banner-id' className='font-black text-6xl'>
 					{title}
 				</div>
@@ -51,8 +48,9 @@ const Banner: FC<PropsTypes> = (props) => {
 						/>
 					) : null}
 					<div data-testid='banner-id'>{username}</div>
-					{followers !== undefined ? 
-				(	<div data-testid='banner-id'>{followers} likes</div>) : null}
+					{followers !== undefined ? (
+						<div data-testid='banner-id'>{followers} likes</div>
+					) : null}
 					<div data-testid='banner-id'>{totalTracks} songs</div>
 				</div>
 			</div>

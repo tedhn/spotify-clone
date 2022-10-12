@@ -1,7 +1,8 @@
-import { getAlbums, getAlbumsTracks } from "@/api";
-import { Heart, Listitem, Options } from "@/components";
+import { checkSaved, getAlbums, getAlbumsTracks, getArtist } from "@/api";
+import { Banner, ContextMenu, Heart, Listitem, Options } from "@/components";
 import { SongType } from "@/types";
-import { convertDate, convertDuration } from "@/utils";
+import useContextMenu from "@/useContextMenu";
+import { convertDuration } from "@/utils";
 import { useEffect, useState } from "react";
 import InfiniteScroll from "react-infinite-scroll-component";
 import { useParams } from "react-router-dom";
@@ -9,9 +10,24 @@ import { useParams } from "react-router-dom";
 const Album = () => {
 	const params = useParams();
 
-	const [album, setAlbum] = useState<any>({});
+	const {
+		playlistRef,
+		isShowMenu,
+		anchorPoints,
+		selectedURI,
+		selectedID,
+		setSelectedURI,
+		setSelectedID,
+		toggleContextMenu,
+	} = useContextMenu();
 
+	const [album, setAlbum] = useState<any>({
+		artists: [{ name: "" }],
+		images: [{ url: "" }],
+	});
+	const [artist, setArtist] = useState<any>({ images: [{ url: "" }] });
 	const [tracks, setTracks] = useState<Array<SongType>>([]);
+	const [isSavedList, setSavedList] = useState<Array<boolean>>([]);
 
 	useEffect(() => {
 		window.scrollTo(0, 0);
@@ -22,7 +38,15 @@ const Album = () => {
 		const albumData = await getAlbums(params.id!);
 		const albumTracks = await getAlbumsTracks(params.id!, 0);
 
+		const artist = await getArtist(albumData.artists[0].id);
+
+		const savedArr = await checkSaved(
+			albumTracks.items.map((track: any) => track.id)
+		);
+
 		setAlbum(albumData);
+		setArtist(artist);
+		setSavedList(savedArr);
 		setTracks(albumTracks.items);
 	};
 
@@ -32,11 +56,36 @@ const Album = () => {
 		setTracks([...tracks, ...moreTracks.items]);
 	};
 
-	console.log(album.totalTracks, tracks.length);
-
 	return (
 		<div className='col-span-10'>
-			{" "}
+			{isShowMenu && (
+				<ContextMenu
+					anchorPoints={anchorPoints}
+					uri={selectedURI}
+					songID={selectedID}
+				/>
+			)}
+
+			<Banner
+				image={
+					<img
+						data-testid='banner-id'
+						src={album.images[0].url}
+						alt='playlist-image'
+						className='object-cover w-64 h-64 '
+					/>
+				}
+				type={
+					<div data-testid='banner-id' className='font-bold uppercase text-xs'>
+						{album.type}
+					</div>
+				}
+				totalTracks={album.total_tracks}
+				title={album.name}
+				username={album.artists[0].name}
+				userImage={artist.images[0].url}
+			/>
+
 			<Options isSHowHeart={true} isSHowOption={true} />
 			<div className='px-8 pb-12'>
 				<InfiniteScroll
@@ -44,10 +93,8 @@ const Album = () => {
 					next={getMoreSongs}
 					hasMore={album.total_tracks === tracks.length ? false : true}
 					loader={<h4 className='py-4'>Loading...</h4>}>
-					<div>
+					<div ref={playlistRef}>
 						{tracks.map((track: any, index: number) => {
-							console.log(track);
-
 							if (track !== null) {
 								return (
 									<Listitem
@@ -78,25 +125,24 @@ const Album = () => {
 													</div>
 												</div>
 
-												{/* 
-											<Heart
-												isSaved={current.isSavedList[index]}
-												isHover={isHover}
-												id={track.id}
-											/> */}
+												<div className='col-start-10 col-end-11'>
+													<Heart
+														isSaved={isSavedList[index]}
+														isHover={isHover}
+														id={track.id}
+													/>
+												</div>
 
-												<div
-													className='text-center col-start-11 col-end-12'
-													data-testid='listitem-id'>
+												<div className='text-center ' data-testid='listitem-id'>
 													{convertDuration(track.duration_ms)}
 												</div>
 												<div
 													className='flex flex-col items-center justify-center relative'
-													// ref={optionRef}
+													ref={optionRef}
 													onClick={(e: any) => {
-														// setSelectedID(track.id);
-														// setSelectedURI(track.uri);
-														// toggleContextMenu(e, menuRef, optionRef);
+														setSelectedID(track.id);
+														setSelectedURI(track.uri);
+														toggleContextMenu(e, menuRef, optionRef);
 													}}>
 													<svg
 														xmlns='http://www.w3.org/2000/svg'
