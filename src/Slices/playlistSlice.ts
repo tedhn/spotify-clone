@@ -1,21 +1,22 @@
+import { PlaylistType } from "@/types";
 import { createSlice } from "@reduxjs/toolkit";
 
 export interface PlaylistSlice {
-  playlists: Array<any>;
+	playlists: Array<PlaylistType>;
 }
 
 const initialState: PlaylistSlice = {
-  playlists: [],
+	playlists: [],
 };
 
 export const playlistSlice = createSlice({
-  name: "playlist",
-  initialState,
-  reducers: {
-    updatePlaylist: (state: PlaylistSlice, action: any) => {
-      state.playlists = action.payload;
-    },
-  },
+	name: "playlist",
+	initialState,
+	reducers: {
+		updatePlaylist: (state: PlaylistSlice, action: any) => {
+			state.playlists = action.payload;
+		},
+	},
 });
 
 // Action creators are generated for each case reducer function

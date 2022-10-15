@@ -1,14 +1,15 @@
+import { UserType } from "@/types";
 import { createSlice } from "@reduxjs/toolkit";
 
 export interface LoginState {
 	authorized: boolean;
-	user: any;
+	user: UserType | undefined;
 	refreshToken: string;
 }
 
 const initialState: LoginState = {
 	authorized: false,
-	user: {},
+	user: undefined,
 	refreshToken: "",
 };
 
@@ -27,7 +28,7 @@ export const authSlice = createSlice({
 		},
 		logout: (state: LoginState) => {
 			state.authorized = false;
-			state.user = {};
+			state.user = undefined;
 		},
 	},
 });

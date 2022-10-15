@@ -8,6 +8,7 @@ import axios from "axios";
 
 import { setSavedTracks } from "@/Slices/savedTracksSlice";
 import { getSavedTracks } from "@/api";
+import { PlaylistType } from "@/types";
 
 const Library = () => {
 	const navigate = useNavigate();
@@ -26,7 +27,6 @@ const Library = () => {
 
 	const onLoad = async () => {
 		const data = await getSavedTracks(tracks.length);
-
 		dispatch(setSavedTracks({ total: data.total, tracks: data.items }));
 	};
 
@@ -57,7 +57,7 @@ const Library = () => {
 					<div>{total} liked songs</div>
 				</div>
 			</div>
-			{playlists.map((playlist: any) => {
+			{playlists.map((playlist: PlaylistType) => {
 				return (
 					<Card result={playlist} subtitle={playlist.owner.display_name} />
 				);

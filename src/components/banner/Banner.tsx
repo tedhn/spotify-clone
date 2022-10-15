@@ -1,12 +1,12 @@
 import { FC } from "react";
 
 interface PropsTypes {
-	image?: any;
-	type: any;
+	image?: React.ReactNode;
+	type: React.ReactNode;
 	followers?: number;
 	totalTracks?: number;
 	description?: string;
-	title: string;
+	title: string | undefined;
 	userImage?: string;
 	username?: string;
 	backgroundImage?: string;

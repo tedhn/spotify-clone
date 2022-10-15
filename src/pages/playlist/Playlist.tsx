@@ -6,7 +6,7 @@ import InfiniteScroll from "react-infinite-scroll-component";
 import { RootState } from "@/store";
 import { Banner, Listitem, Options, ContextMenu, Heart } from "@/components";
 import { convertDate, convertDuration } from "@/utils";
-import { SongType } from "@/types";
+import { SongType, TrackType } from "@/types";
 import useContextMenu from "@/useContextMenu";
 import { checkSaved, getPlaylistData, getPlaylistTracks, getUser } from "@/api";
 
@@ -24,7 +24,6 @@ const Playlist = () => {
 	} = useContextMenu();
 
 	const playlists = useSelector((state: RootState) => state.playlist.playlists);
-	const playlist = playlists.filter((playlist) => playlist.id === params.id)[0];
 
 	const [current, setCurrent] = useState<any>({
 		imageURL: "",
@@ -45,20 +44,9 @@ const Playlist = () => {
 	}, [params.id]);
 
 	const onLoad = async () => {
-		// const { tracks, playlistData, userImage } = await getPlaylistData(
-		// 	playlist.owner.id,
-		// 	params.id!
-		// );
-
 		const playlistData = await getPlaylistData(params.id!);
-
 		const user = await getUser(playlistData.owner.id);
-
-		const tracks = await getPlaylistTracks(params.id!, current.tracks.length);
-
-		const isSavedList = await checkSaved(
-			tracks.map((track: any) => track.track.id)
-		);
+		const { newTracks, newSavedList } = await getSongs();
 
 		setCurrent({
 			...current,
@@ -70,20 +58,28 @@ const Playlist = () => {
 			username: playlistData.owner.display_name,
 			followers: playlistData.followers.total,
 			userImage: user.images[0]?.url,
-			tracks: tracks,
-			isSavedList: isSavedList,
+			tracks: newTracks,
+			isSavedList: newSavedList,
 		});
 	};
 
-	const getMoreSongs = async () => {
+	const getSongs = async () => {
 		const tracks = await getPlaylistTracks(params.id!, current.tracks.length);
 
-		const isSavedList = await checkSaved(tracks);
+		const isSavedList = await checkSaved(
+			tracks.map((track: SongType) => track.track.id)
+		);
+
+		return { newTracks: tracks, newSavedList: isSavedList };
+	};
+
+	const handleLoadMoreSongs = async () => {
+		const { newTracks, newSavedList } = await getSongs();
 
 		setCurrent({
 			...current,
-			tracks: [...current.tracks, ...tracks],
-			isSavedList: [...current.isSavedList, ...isSavedList],
+			tracks: [...current.tracks, ...newTracks],
+			isSavedList: newSavedList,
 		});
 	};
 
@@ -108,7 +104,7 @@ const Playlist = () => {
 				}
 				type={
 					<div data-testid='banner-id' className='font-bold uppercase text-xs'>
-						{current.isPublic ? "public playlist" : "private playlist"} 
+						{current.isPublic ? "public playlist" : "private playlist"}
 					</div>
 				}
 				totalTracks={current.totalTracks}
@@ -144,7 +140,7 @@ const Playlist = () => {
 
 				<InfiniteScroll
 					dataLength={current.tracks}
-					next={getMoreSongs}
+					next={handleLoadMoreSongs}
 					hasMore={current.totalTracks === current.tracks.length ? false : true}
 					loader={<h4 className='py-4'>Loading...</h4>}>
 					<div ref={playlistRef}>
@@ -206,7 +202,7 @@ const Playlist = () => {
 												<div
 													className='flex flex-col items-center justify-center relative'
 													ref={optionRef}
-													onClick={(e: any) => {
+													onClick={(e: React.MouseEvent<HTMLDivElement>) => {
 														setSelectedID(track.id);
 														setSelectedURI(track.uri);
 														toggleContextMenu(e, menuRef, optionRef);

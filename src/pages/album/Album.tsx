@@ -1,6 +1,6 @@
 import { checkSaved, getAlbums, getAlbumsTracks, getArtist } from "@/api";
 import { Banner, ContextMenu, Heart, Listitem, Options } from "@/components";
-import { SongType } from "@/types";
+import { AlbumType, ArtistType, SongType, TrackType } from "@/types";
 import useContextMenu from "@/useContextMenu";
 import { convertDuration } from "@/utils";
 import { useEffect, useState } from "react";
@@ -21,12 +21,9 @@ const Album = () => {
 		toggleContextMenu,
 	} = useContextMenu();
 
-	const [album, setAlbum] = useState<any>({
-		artists: [{ name: "" }],
-		images: [{ url: "" }],
-	});
-	const [artist, setArtist] = useState<any>({ images: [{ url: "" }] });
-	const [tracks, setTracks] = useState<Array<SongType>>([]);
+	const [album, setAlbum] = useState<AlbumType>();
+	const [artist, setArtist] = useState<ArtistType>();
+	const [tracks, setTracks] = useState<Array<TrackType>>([]);
 	const [isSavedList, setSavedList] = useState<Array<boolean>>([]);
 
 	useEffect(() => {
@@ -41,7 +38,7 @@ const Album = () => {
 		const artist = await getArtist(albumData.artists[0].id);
 
 		const savedArr = await checkSaved(
-			albumTracks.items.map((track: any) => track.id)
+			albumTracks.items.map((track: TrackType) => track.id)
 		);
 
 		setAlbum(albumData);
@@ -52,6 +49,7 @@ const Album = () => {
 
 	const getMoreSongs = async () => {
 		const moreTracks = await getAlbumsTracks(params.id!, tracks.length);
+
 
 		setTracks([...tracks, ...moreTracks.items]);
 	};
@@ -70,20 +68,20 @@ const Album = () => {
 				image={
 					<img
 						data-testid='banner-id'
-						src={album.images[0].url}
+						src={album?.images[0].url}
 						alt='playlist-image'
 						className='object-cover w-64 h-64 '
 					/>
 				}
 				type={
 					<div data-testid='banner-id' className='font-bold uppercase text-xs'>
-						{album.type}
+						{album?.type}
 					</div>
 				}
-				totalTracks={album.total_tracks}
-				title={album.name}
-				username={album.artists[0].name}
-				userImage={artist.images[0].url}
+				totalTracks={album?.total_tracks}
+				title={album?.name}
+				username={album?.artists[0].name}
+				userImage={artist?.images[0].url}
 			/>
 
 			<Options isSHowHeart={true} isSHowOption={true} />
@@ -91,10 +89,10 @@ const Album = () => {
 				<InfiniteScroll
 					dataLength={tracks.length}
 					next={getMoreSongs}
-					hasMore={album.total_tracks === tracks.length ? false : true}
+					hasMore={album?.total_tracks === tracks.length ? false : true}
 					loader={<h4 className='py-4'>Loading...</h4>}>
 					<div ref={playlistRef}>
-						{tracks.map((track: any, index: number) => {
+						{tracks.map((track: TrackType, index: number) => {
 							if (track !== null) {
 								return (
 									<Listitem
@@ -139,7 +137,7 @@ const Album = () => {
 												<div
 													className='flex flex-col items-center justify-center relative'
 													ref={optionRef}
-													onClick={(e: any) => {
+													onClick={(e: React.MouseEvent<HTMLDivElement>) => {
 														setSelectedID(track.id);
 														setSelectedURI(track.uri);
 														toggleContextMenu(e, menuRef, optionRef);

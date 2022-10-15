@@ -38,10 +38,14 @@ export const getPlaylistData = async (playlistId: string) => {
 	return data;
 };
 export const getPlaylistTracks = async (id: string, offset: number) => {
+	console.log(id , offset)
+
 	const { data } = await axios.post(BASE_API_URL + "/getPlaylistTracks", {
 		playlistId: id,
 		offset,
 	});
+
+	console.log(data)
 
 	return data.tracks;
 };

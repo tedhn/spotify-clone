@@ -10,7 +10,7 @@ import { RootState } from "@/store";
 import { SongType } from "@/types";
 import { convertDate, convertDuration } from "@/utils";
 import useContextMenu from "@/useContextMenu";
-import { removeFromSavedTracks } from "@/api";
+import { getSavedTracks } from "@/api";
 
 const SavedSongs = () => {
 	const dispatch = useDispatch();
@@ -28,8 +28,8 @@ const SavedSongs = () => {
 
 	const { total } = useSelector((rootState: RootState) => rootState.tracks);
 
-	const [tracks, setTracks] = useState<any>([]);
-	const [totalTracks, setTotal] = useState<any>(total);
+	const [tracks, setTracks] = useState<Array<SongType>>([]);
+	const [totalTracks, setTotal] = useState<number>(total);
 
 	const user = useSelector((rootState: RootState) => rootState.auth.user);
 
@@ -38,16 +38,26 @@ const SavedSongs = () => {
 	}, []);
 
 	const loadSongs = async () => {
-		const { data } = await axios.post("http://localhost:3001/savedTracks", {
-			offset: tracks.length,
-		});
+		const data = await getSavedTracks(tracks.length);
 
 		setTracks([...tracks, ...data.items]);
+
+		console.log(data.items);
 		dispatch(
 			setSavedTracks({ total: data.total, tracks: [...tracks, ...data.items] })
 		);
 	};
 
+	const handleOptionClick = (
+		song: SongType,
+		e: React.MouseEvent<HTMLDivElement>,
+		menuRef: HTMLDivElement,
+		optionRef: HTMLDivElement
+	) => {
+		setSelectedID(song.track.id);
+		setSelectedURI(song.track.uri);
+		toggleContextMenu(e, menuRef, optionRef);
+	};
 
 	return (
 		<div className='col-span-10'>
@@ -79,11 +89,15 @@ const SavedSongs = () => {
 						</div>
 					</div>
 				}
-				isPublic={false}
+				type={
+					<div data-testid='banner-id' className='font-bold uppercase text-xs'>
+						{false ? "public playlist" : "private playlist"}
+					</div>
+				}
 				totalTracks={totalTracks}
 				title={"Liked Songs"}
-				username={user.display_name}
-				userImage={user.images[0]?.url}
+				username={user?.display_name}
+				userImage={user?.images[0]?.url}
 			/>
 			<Options />
 
@@ -120,12 +134,12 @@ const SavedSongs = () => {
 							const { track } = song;
 							return (
 								<Listitem
-									key={track.id + index}
-									uri={track.uri}
+									key={song.track.id + index}
+									uri={song.track.uri}
 									render={(
 										isHover: boolean,
-										menuRef: any,
-										optionRef: any,
+										menuRef: HTMLDivElement,
+										optionRef: HTMLDivElement,
 										setIsHover: React.Dispatch<React.SetStateAction<boolean>>
 									) => (
 										<div
@@ -137,7 +151,7 @@ const SavedSongs = () => {
 											</div>
 											<img
 												className='w-10 h-10'
-												src={track.album.images[0].url}
+												src={song.track.album.images[0].url}
 												alt='track-image'
 												data-testid='listitem-id'
 											/>
@@ -145,15 +159,15 @@ const SavedSongs = () => {
 												<div
 													className='text-sm text-white w-72 overflow-hidden text-ellipsis whitespace-nowrap'
 													data-testid='listitem-id'>
-													{track.name}
+													{song.track.name}
 												</div>
 												<div data-testid='listitem-id'>
-													{track.album.artists[0].name}
+													{song.track.album.artists[0].name}
 												</div>
 											</div>
 
 											<div className='col-span-2' data-testid='listitem-id'>
-												{track.album.name}
+												{song.track.album.name}
 											</div>
 											<div
 												className='col-span-2 text-start'
@@ -161,16 +175,15 @@ const SavedSongs = () => {
 												{convertDate(song.added_at)}
 											</div>
 											<div className='text-center' data-testid='listitem-id'>
-												{convertDuration(track.duration_ms)}
+												{convertDuration(song.track.duration_ms)}
 											</div>
 
 											<div
 												className='flex flex-col items-center justify-center relative'
+												//@ts-ignore
 												ref={optionRef}
-												onClick={(e: any) => {
-													setSelectedID(track.id);
-													setSelectedURI(track.uri);
-													toggleContextMenu(e, menuRef, optionRef);
+												onClick={(e: React.MouseEvent<HTMLDivElement>) => {
+													handleOptionClick(song, e, menuRef!, optionRef!);
 												}}>
 												<svg
 													xmlns='http://www.w3.org/2000/svg'

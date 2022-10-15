@@ -1,4 +1,6 @@
-import { useState } from "react";
+import React, { useState } from "react";
+import { useEffect } from "react";
+import { useParams } from "react-router-dom";
 
 import {
 	checkSaved,
@@ -7,11 +9,10 @@ import {
 	getArtistRelatedArtists,
 	getArtistTopTracks,
 } from "@/api";
-import { useEffect } from "react";
-import { useParams } from "react-router-dom";
 import { Banner, Card, ContextMenu, Heart, Listitem } from "@/components";
 import { convertDuration } from "@/utils";
 import useContextMenu from "@/useContextMenu";
+import { AlbumType, ArtistType, TrackType } from "@/types";
 
 const Artist = () => {
 	const params = useParams();
@@ -27,10 +28,10 @@ const Artist = () => {
 		toggleContextMenu,
 	} = useContextMenu();
 
-	const [artist, setArtist] = useState<any>({ images: [{ url: "" }] });
-	const [album, setAlbum] = useState<any>({ items: [] });
-	const [tracks, setTracks] = useState<any>([]);
-	const [relatedArtists, setRelatedArtists] = useState<any>([]);
+	const [artist, setArtist] = useState<ArtistType | undefined>();
+	const [album, setAlbum] = useState<Array<AlbumType>>([]);
+	const [tracks, setTracks] = useState<Array<TrackType>>([]);
+	const [relatedArtists, setRelatedArtists] = useState<Array<ArtistType>>([]);
 	const [isSavedList, setSavedList] = useState<Array<boolean>>([]);
 
 	useEffect(() => {
@@ -45,10 +46,10 @@ const Artist = () => {
 		const topTracks = await getArtistTopTracks(params.id!);
 		const relatedArtistsData = await getArtistRelatedArtists(params.id!);
 		const savedArr = await checkSaved(
-			topTracks.tracks.map((track: any) => track.id)
+			topTracks.tracks.map((track: TrackType) => track.id)
 		);
 		setArtist(artistData);
-		setAlbum(artistAlbums);
+		setAlbum(artistAlbums.items);
 		setTracks(topTracks.tracks);
 		setRelatedArtists(relatedArtistsData.artists.slice(0, 5));
 		setSavedList(savedArr);
@@ -68,24 +69,24 @@ const Artist = () => {
 				image={
 					<img
 						data-testid='banner-id'
-						src={artist.images[0].url}
+						src={artist?.images[0].url}
 						alt='playlist-image'
 						className='object-cover w-64 h-64 '
 					/>
 				}
-				backgroundImage={artist.images[0].url}
+				backgroundImage={artist?.images[0].url}
 				type={
 					<div data-testid='banner-id' className='font-bold uppercase text-xs'>
-						{artist.type}
+						{artist?.type}
 					</div>
 				}
-				title={artist.name}
+				title={artist?.name}
 			/>
 
 			<div className='px-8 pb-12'>
 				<div className='my-4 text-2xl'>Popular</div>
 				<div ref={playlistRef}>
-					{tracks.map((track: any, index: number) => {
+					{tracks.map((track: TrackType, index: number) => {
 						if (track !== null) {
 							return (
 								<Listitem
@@ -130,7 +131,7 @@ const Artist = () => {
 											<div
 												className='flex flex-col items-center justify-center relative'
 												ref={optionRef}
-												onClick={(e: any) => {
+												onClick={(e: React.MouseEvent<HTMLDivElement>) => {
 													setSelectedID(track.id);
 													setSelectedURI(track.uri);
 													toggleContextMenu(e, menuRef, optionRef);
@@ -159,7 +160,7 @@ const Artist = () => {
 
 				<div className='my-4 text-2xl'>Albums</div>
 				<ul className='flex flex-wrap justify-around items-center mt-6'>
-					{album.items.map((result: any) => {
+					{album.map((result: AlbumType) => {
 						return (
 							<Card result={result} key={result.id} subtitle={result.type} />
 						);
@@ -167,7 +168,7 @@ const Artist = () => {
 				</ul>
 				<div className='my-4 text-2xl'>Artists</div>
 				<ul className='flex flex-wrap justify-around items-center mt-6'>
-					{relatedArtists.map((result: any) => {
+					{relatedArtists.map((result: ArtistType) => {
 						return (
 							<Card result={result} key={result.id} subtitle={result.type} />
 						);

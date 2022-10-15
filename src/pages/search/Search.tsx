@@ -6,12 +6,13 @@ import { Listitem, Card, ContextMenu, Heart } from "@/components";
 import { convertDuration } from "@/utils";
 import useContextMenu from "@/useContextMenu";
 import { checkSaved, search } from "@/api";
+import { AlbumType, ArtistType, PlaylistType, TrackType } from "@/types";
 
 const Search = () => {
 	const navigate = useNavigate();
 
 	const [query, setQuery] = useState("");
-	const [searchResults, setSearchResutls] = useState<any>({
+	const [searchResults, setSearchResutls] = useState({
 		tracks: [],
 		albums: [],
 		playlists: [],
@@ -42,7 +43,7 @@ const Search = () => {
 				const { tracks, albums, playlists, artists, episodes, shows } = data;
 
 				const savedArr = await checkSaved(
-					tracks.items.map((track: any) => track.id)
+					tracks.items.map((track: TrackType) => track.id)
 				);
 
 				setSavedList(savedArr);
@@ -84,7 +85,7 @@ const Search = () => {
 					)}
 					<div className='my-4 text-2xl'>Songs</div>
 					<ul className='mt-8' ref={playlistRef}>
-						{searchResults.tracks.map((result: any, index: number) => {
+						{searchResults.tracks.map((result: TrackType, index: number) => {
 							return (
 								<Listitem
 									key={result.id}
@@ -134,7 +135,7 @@ const Search = () => {
 											<div
 												className='flex flex-col items-center justify-center relative'
 												ref={optionRef}
-												onClick={(e: any) => {
+												onClick={(e: React.MouseEvent<HTMLDivElement>) => {
 													setSelectedID(result.id);
 													setSelectedURI(result.uri);
 													toggleContextMenu(e, menuRef, optionRef);
@@ -161,7 +162,7 @@ const Search = () => {
 					</ul>
 					<div className='my-4 text-2xl'>Aritsts</div>
 					<ul className='flex flex-wrap justify-around items-center mt-6'>
-						{searchResults.artists.map((result: any) => {
+						{searchResults.artists.map((result: ArtistType) => {
 							return (
 								<Card result={result} key={result.id} subtitle={result.type} />
 							);
@@ -169,7 +170,7 @@ const Search = () => {
 					</ul>
 					<div className='my-4 text-2xl'>Playlists</div>
 					<ul className='flex flex-wrap justify-around items-center mt-6'>
-						{searchResults.playlists.map((result: any) => {
+						{searchResults.playlists.map((result: PlaylistType) => {
 							return (
 								<Card result={result} key={result.id} subtitle={result.type} />
 							);
@@ -177,7 +178,7 @@ const Search = () => {
 					</ul>
 					<div className='my-4 text-2xl'>Albums</div>
 					<ul className='flex flex-wrap justify-around items-center mt-6'>
-						{searchResults.albums.map((result: any) => {
+						{searchResults.albums.map((result: AlbumType) => {
 							return (
 								<Card result={result} key={result.id} subtitle={result.type} />
 							);
