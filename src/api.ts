@@ -1,11 +1,13 @@
-import { SongType } from "./types.d";
+import { PlaylistType, SongType, UserType, PlaylistDataType } from "./types.d";
 import axios from "axios";
 
 const BASE_API_URL = "http://localhost:3001";
 
 // GENERAL API
 
-export const checkSaved = async (tracks: Array<string>) => {
+export const checkSaved = async (
+	tracks: Array<string>
+): Promise<Array<boolean>> => {
 	const { data } = await axios.post(BASE_API_URL + "/checkTracks", {
 		idList: tracks,
 	});
@@ -13,7 +15,7 @@ export const checkSaved = async (tracks: Array<string>) => {
 	return data;
 };
 
-export const getUser = async (userId: string) => {
+export const getUser = async (userId: string): Promise<UserType> => {
 	const { data } = await axios.post(BASE_API_URL + "/getUser", {
 		userId,
 	});
@@ -30,22 +32,27 @@ export const getArtist = async (artistId: string) => {
 
 // PLAYLIST APIS
 
-export const getPlaylistData = async (playlistId: string) => {
+export const getPlaylistData = async (
+	playlistId: string
+): Promise<PlaylistDataType> => {
 	const { data } = await axios.post(BASE_API_URL + "/getPlaylistData", {
 		playlistId,
 	});
 
 	return data;
 };
-export const getPlaylistTracks = async (id: string, offset: number) => {
-	console.log(id , offset)
+export const getPlaylistTracks = async (
+	id: string,
+	offset: number
+): Promise<Array<SongType>> => {
+	console.log(id, offset);
 
 	const { data } = await axios.post(BASE_API_URL + "/getPlaylistTracks", {
 		playlistId: id,
 		offset,
 	});
 
-	console.log(data)
+	console.log(data);
 
 	return data.tracks;
 };
@@ -109,13 +116,12 @@ export const getAlbumsTracks = async (id: string, offset: number) => {
 	return data;
 };
 
-
 // ARTIST APIS
 
 export const getArtistTopTracks = async (id: string) => {
 	const { data } = await axios.post(BASE_API_URL + "/getArtistTopTracks", {
 		id,
-		market : "SG"
+		market: "SG",
 	});
 
 	return data;

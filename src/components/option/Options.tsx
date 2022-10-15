@@ -1,13 +1,13 @@
 import { FC } from "react";
 
 interface PropTypes {
-	isSHowHeart?: boolean;
-	isSHowOption?: boolean;
+	isShowHeart?: boolean;
+	isShowOption?: boolean;
 }
 
 const Options: FC<PropTypes> = ({
-	isSHowHeart = false,
-	isSHowOption = false,
+	isShowHeart = false,
+	isShowOption = false,
 }) => {
 	return (
 		<div className='flex justify-between items-center px-8 py-12'>
@@ -27,7 +27,7 @@ const Options: FC<PropTypes> = ({
 						/>
 					</svg>
 				</div>
-				{isSHowHeart && (
+				{isShowHeart && (
 					<div>
 						<svg
 							xmlns='http://www.w3.org/2000/svg'
@@ -59,7 +59,7 @@ const Options: FC<PropTypes> = ({
 						/>
 					</svg>
 				</div>
-				{isSHowOption && (
+				{isShowOption && (
 					<div>
 						<svg
 							xmlns='http://www.w3.org/2000/svg'

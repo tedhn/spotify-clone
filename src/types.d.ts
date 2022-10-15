@@ -31,6 +31,7 @@ export interface TrackType {
 	track_number: number;
 	type: string;
 	uri: string;
+	total: number;
 }
 
 export interface AlbumType {
@@ -69,7 +70,7 @@ export interface PlaylistType {
 	external_url: { spotify: string };
 	href: string;
 	id: string;
-	image: Array<ImageType>;
+	images: Array<ImageType>;
 	name: string;
 	owner: UserType;
 	primary_color: null;
@@ -90,4 +91,9 @@ export interface UserType {
 	product: string;
 	type: string;
 	uri: string;
+}
+
+export interface PlaylistDataType extends PlaylistType {
+	followers: { total: number };
+	tracks: TrackType;
 }
