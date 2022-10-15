@@ -17,7 +17,7 @@ const Dashboard = () => {
 	return (
 		<div className='w-full col-span-10 bg-darkgrey'>
 			<div className='p-8 text-lg font-bold'>
-				Good Evening , {user.display_name}
+				Good Evening , {user?.display_name}
 			</div>
 			<button onClick={logout}>Log out</button>
 		</div>
