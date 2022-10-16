@@ -11,8 +11,10 @@ import { SongType } from "@/types";
 import { convertDate, convertDuration } from "@/utils";
 import useContextMenu from "@/useContextMenu";
 import { getSavedTracks } from "@/api";
+import { useNavigate } from "react-router-dom";
 
 const SavedSongs = () => {
+	const navigate = useNavigate();
 	const dispatch = useDispatch();
 
 	const {
@@ -21,9 +23,7 @@ const SavedSongs = () => {
 		anchorPoints,
 		selectedURI,
 		selectedID,
-		setSelectedURI,
-		setSelectedID,
-		toggleContextMenu,
+		handleOptionClick,
 	} = useContextMenu();
 
 	const { total } = useSelector((rootState: RootState) => rootState.tracks);
@@ -48,15 +48,8 @@ const SavedSongs = () => {
 		);
 	};
 
-	const handleOptionClick = (
-		song: SongType,
-		e: React.MouseEvent<HTMLDivElement>,
-		menuRef: HTMLDivElement,
-		optionRef: HTMLDivElement
-	) => {
-		setSelectedID(song.track.id);
-		setSelectedURI(song.track.uri);
-		toggleContextMenu(e, menuRef, optionRef);
+	const handleNavigate = (type: string, id: string) => {
+		navigate(`/dashboard/${type}/${id}`);
 	};
 
 	return (
@@ -161,12 +154,20 @@ const SavedSongs = () => {
 													data-testid='listitem-id'>
 													{song.track.name}
 												</div>
-												<div data-testid='listitem-id'>
+												<div
+													data-testid='listitem-id'
+													className='hover:text-white hover:underline'
+													onClick={() =>
+														handleNavigate("artist", track.artists[0].id)
+													}>
 													{song.track.album.artists[0].name}
 												</div>
 											</div>
 
-											<div className='col-span-2' data-testid='listitem-id'>
+											<div
+												className='col-span-2 hover:text-white hover:underline'
+												data-testid='listitem-id'
+												onClick={() => handleNavigate("album", track.album.id)}>
 												{song.track.album.name}
 											</div>
 											<div
@@ -183,7 +184,13 @@ const SavedSongs = () => {
 												//@ts-ignore
 												ref={optionRef}
 												onClick={(e: React.MouseEvent<HTMLDivElement>) => {
-													handleOptionClick(song, e, menuRef!, optionRef!);
+													handleOptionClick(
+														track.id,
+														track.uri,
+														e,
+														menuRef!,
+														optionRef!
+													);
 												}}>
 												<svg
 													xmlns='http://www.w3.org/2000/svg'

@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
-import { useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import InfiniteScroll from "react-infinite-scroll-component";
 
 import { RootState } from "@/store";
@@ -18,6 +18,7 @@ import { checkSaved, getPlaylistData, getPlaylistTracks, getUser } from "@/api";
 import Loading from "@/components/loading/Loading";
 
 const Playlist = () => {
+	const navigate = useNavigate();
 	const params = useParams();
 	const {
 		playlistRef,
@@ -25,9 +26,7 @@ const Playlist = () => {
 		anchorPoints,
 		selectedURI,
 		selectedID,
-		setSelectedURI,
-		setSelectedID,
-		toggleContextMenu,
+		handleOptionClick,
 	} = useContextMenu();
 
 	// const playlists = useSelector((state: RootState) => state.playlist.playlists);
@@ -61,8 +60,6 @@ const Playlist = () => {
 	const onLoad = async () => {
 		const playlistData = await getPlaylistData(params.id!);
 		const user = await getUser(playlistData.owner.id);
-
-		console.log(playlist.tracks);
 		const { newTracks, newSavedList } = await getSongs(0);
 
 		setPlaylist({
@@ -96,6 +93,9 @@ const Playlist = () => {
 			tracks: [...playlist.tracks, ...newTracks],
 			isSavedList: [...playlist.isSavedList, ...newSavedList],
 		});
+	};
+	const handleNavigate = (type: string, id: string) => {
+		navigate(`/dashboard/${type}/${id}`);
 	};
 
 	return (
@@ -209,14 +209,22 @@ const Playlist = () => {
 																data-testid='listitem-id'>
 																{track.name}
 															</div>
-															<div data-testid='listitem-id'>
+															<div
+																data-testid='listitem-id'
+																className='hover:text-white hover:underline'
+																onClick={() =>
+																	handleNavigate("artist", track.artists[0].id)
+																}>
 																{track.album.artists[0].name}
 															</div>
 														</div>
 
 														<div
-															className='col-span-2'
-															data-testid='listitem-id'>
+															className='col-span-2 hover:text-white hover:underline'
+															data-testid='listitem-id'
+															onClick={() =>
+																handleNavigate("album", track.album.id)
+															}>
 															{track.album.name}
 														</div>
 														<div
@@ -239,13 +247,15 @@ const Playlist = () => {
 														<div
 															className='flex flex-col items-center justify-center relative'
 															ref={optionRef}
-															onClick={(
-																e: React.MouseEvent<HTMLDivElement>
-															) => {
-																setSelectedID(track.id);
-																setSelectedURI(track.uri);
-																toggleContextMenu(e, menuRef, optionRef);
-															}}>
+															onClick={(e: React.MouseEvent<HTMLDivElement>) =>
+																handleOptionClick(
+																	track.id,
+																	track.uri,
+																	e,
+																	menuRef,
+																	optionRef
+																)
+															}>
 															<svg
 																xmlns='http://www.w3.org/2000/svg'
 																fill='none'

@@ -1,4 +1,12 @@
-import { PlaylistType, SongType, UserType, PlaylistDataType } from "./types.d";
+import {
+	PlaylistType,
+	SongType,
+	UserType,
+	PlaylistDataType,
+	TrackType,
+	AlbumType,
+	ArtistType,
+} from "./types.d";
 import axios from "axios";
 
 const BASE_API_URL = "http://localhost:3001";
@@ -22,7 +30,7 @@ export const getUser = async (userId: string): Promise<UserType> => {
 
 	return data;
 };
-export const getArtist = async (artistId: string) => {
+export const getArtist = async (artistId: string): Promise<ArtistType> => {
 	const { data } = await axios.post(BASE_API_URL + "/getArtist", {
 		artistId,
 	});
@@ -100,43 +108,53 @@ export const removeFromSavedTracks = async (id: string) => {
 
 // ALBUM APIS
 
-export const getAlbums = async (id: string) => {
+export const getAlbums = async (id: string): Promise<AlbumType> => {
 	const { data } = await axios.post(BASE_API_URL + "/getAlbums", {
 		id,
 	});
 
 	return data;
 };
-export const getAlbumsTracks = async (id: string, offset: number) => {
+export const getAlbumsTracks = async (
+	id: string,
+	offset: number
+): Promise<Array<TrackType>> => {
+	console.log(id, offset);
 	const { data } = await axios.post(BASE_API_URL + "/getAlbumsTracks", {
 		id,
 		offset,
 	});
 
-	return data;
+	return data.items;
 };
 
 // ARTIST APIS
 
-export const getArtistTopTracks = async (id: string) => {
+export const getArtistTopTracks = async (
+	id: string
+): Promise<Array<TrackType>> => {
 	const { data } = await axios.post(BASE_API_URL + "/getArtistTopTracks", {
 		id,
 		market: "SG",
 	});
 
-	return data;
+	return data.tracks;
 };
-export const getArtistAlbums = async (id: string) => {
+export const getArtistAlbums = async (
+	id: string
+): Promise<Array<AlbumType>> => {
 	const { data } = await axios.post(BASE_API_URL + "/getArtistAlbums", {
 		id,
 	});
 
-	return data;
+	return data.items;
 };
-export const getArtistRelatedArtists = async (id: string) => {
+export const getArtistRelatedArtists = async (
+	id: string
+): Promise<Array<ArtistType>> => {
 	const { data } = await axios.post(BASE_API_URL + "/getArtistRelatedArtists", {
 		id,
 	});
 
-	return data;
+	return data.artists.slice(0, 5);
 };

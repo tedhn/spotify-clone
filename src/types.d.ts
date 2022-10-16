@@ -11,7 +11,7 @@ export interface SongType {
 }
 export interface TrackType {
 	album: AlbumType;
-	artists: Array;
+	artists: Array<ArtistType>;
 	available_markets: string;
 	disc_number: number;
 	duration_ms: number;
