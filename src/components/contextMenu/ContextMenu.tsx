@@ -1,11 +1,13 @@
 import axios from "axios";
-import { FC, useEffect, useState } from "react";
+import { FC, useEffect, useRef, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { updatePlaylist } from "@/Slices/playlistSlice";
 import { addToPlaylist, addToSavedTracks, removeFromSavedTracks } from "@/api";
 import { useNavigate } from "react-router-dom";
 import useContextMenu from "@/useContextMenu";
 import { RootState } from "@/store";
+import { setContext } from "redux-saga/effects";
+import MenuItem from "./MenuItem";
 
 interface PropTypes {
 	anchorPoints: { x: number; y: number };
@@ -18,14 +20,6 @@ interface PropTypes {
 	};
 }
 
-const menuOptions = [
-	{ label: "Go to song radio", action: "goToRadio" },
-	{ label: "Go to artist", action: "goToArtist" },
-	{ label: "Go to album", action: "goToAlbum" },
-	{ label: "Remove fromliked songs", action: "removeSongFromSaveTracks" },
-	{ label: "Add to playlist", action: "addToPlaylist" },
-];
-
 const ContextMenu: FC<PropTypes> = ({
 	anchorPoints: { x, y },
 	selected,
@@ -34,37 +28,13 @@ const ContextMenu: FC<PropTypes> = ({
 	const navigate = useNavigate();
 	const dispatch = useDispatch();
 
-	const [isShowPlaylists, setShowPlaylists] = useState(false);
+	const { setContextMenuRef } = useContextMenu();
 
-	const handleClick = (choice: string) => {
-		switch (choice) {
-			case "goToArtist": {
-				navigate(`/dashboard/artist/${selected.artistId}`);
-				break;
-			}
-			case "goToAlbum": {
-				navigate(`/dashboard/album/${selected.albumId}`);
-				break;
-			}
-			case "addToPlaylist": {
-				addToPlaylist(selected.uri);
-				break;
-			}
-			case "addToSaveTracks": {
-				console.log("removing song to Saved Tracka :" + selected.songId);
-				addToSavedTracks(selected.songId);
-				break;
-			}
-			case "removeSongFromSaveTracks": {
-				console.log("removing song to Saved Tracka :" + selected.songId);
-				removeFromSavedTracks(selected.songId);
-				break;
-			}
-			default: {
-				break;
-			}
-		}
-	};
+	const playlists = useSelector(
+		(rootState: RootState) => rootState.playlist.playlists
+	);
+
+	const contextMenuRef = useRef<any>();
 
 	const handleNavigate = (type: string, id: string) => {
 		navigate(`/dashboard/${type}/${id}`);
@@ -72,84 +42,59 @@ const ContextMenu: FC<PropTypes> = ({
 
 	const handleSaveSongs = () => {
 		if (selected.isSaved) {
-			addToSavedTracks(selected.songId);
-		} else {
+			console.log("removing");
 			removeFromSavedTracks(selected.songId);
+		} else {
+			console.log("adding");
+			addToSavedTracks(selected.songId);
 		}
 	};
-	const handlePlaylist = () => {};
+	const handlePlaylist = (id: string) => {
+		console.log(id);
+	};
+
+	useEffect(() => {
+		console.log(contextMenuRef);
+		setContextMenuRef(contextMenuRef);
+	}, []);
 
 	return (
 		<div
-			className='absolute text-sm z-10 w-48 shadow-md bg-black rounded-md px-2 py-4 flex flex-col justify-around gap-1'
+			className='absolute text-sm z-10 w-48 shadow-md bg-black rounded-md py-4 flex flex-col justify-around gap-1'
 			style={{
 				bottom: y,
 				right: x,
-			}}>
-			{/* {menuOptions.map((item) => (
-				<div
-					key={item.label}
-					className='hover:bg-lightgrey/30 px-2 py-1 text-white'
-					onClick={() => handleClick(item.action)}>
-					{item.label}
-				</div>
-			))} */}
-			<div
-				className='hover:bg-lightgrey/30 px-2 py-1 text-white'
-				onClick={() => handleNavigate("", "")}>
-				Go to song radio
-			</div>
-			<div
-				className='hover:bg-lightgrey/30 px-2 py-1 text-white'
-				onClick={() => handleNavigate("artist", selected.artistId)}>
-				Go to song artist
-			</div>
-			<div
-				className='hover:bg-lightgrey/30 px-2 py-1 text-white'
-				onClick={() => handleNavigate("album", selected.albumId)}>
-				Go to song album
-			</div>
+			}}
+			ref={contextMenuRef}>
+			<MenuItem
+				label='Go to song radio'
+				handler={() => handleNavigate("", "")}
+			/>
+			<MenuItem
+				label='Go to song album'
+				handler={() => handleNavigate("album", selected.albumId)}
+			/>
+			<MenuItem
+				label='Go to song Artist'
+				handler={() => handleNavigate("album", selected.artistId)}
+			/>
 
 			<hr />
-			<div
-				className='hover:bg-lightgrey/30 px-2 py-1 text-white'
-				onClick={() => handleSaveSongs()}>
-				{selected.isSaved ? "Remove from" : "Add to"} like songs
-			</div>
-			<div
-				className='hover:bg-lightgrey/30 px-2 py-1 text-white'
-				onMouseEnter={() => setShowPlaylists(true)}
-				onMouseLeave={() => setShowPlaylists(false)}>
-				Add to playlist
-				{isShowPlaylists && <PlaylistMenu />}
-			</div>
+
+			<MenuItem
+				label={`${selected.isSaved ? "Remove from" : "Add to"} saved songs`}
+				handler={handleSaveSongs}
+			/>
+			<MenuItem
+				label='Add to playlist'
+				items={playlists}
+				depth={1}
+				handler={handlePlaylist}
+			/>
 		</div>
 	);
 };
 
-const PlaylistMenu = () => {
-	const playlists = useSelector(
-		(rootState: RootState) => rootState.playlist.playlists
-	);
-
-	const handleClick = () => {
-		console.log("clicked playlist");
-	};
-
-	return (
-		<div
-			className='absolute text-sm z-10 w-48 shadow-md bg-black rounded-md px-2 py-4 flex flex-col justify-around gap-1'
-			style={{
-				bottom: 0,
-				right: 200,
-			}}>
-			{playlists.map((playlist) => (
-				<div key={playlist.id} onClick={handleClick}>
-					{playlist.name}
-				</div>
-			))}
-		</div>
-	);
-};
+//TODO : NEED TO FIX AUTO CLOSER FOR CONTEXT MENU
 
 export default ContextMenu;
