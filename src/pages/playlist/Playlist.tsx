@@ -20,14 +20,8 @@ import Loading from "@/components/loading/Loading";
 const Playlist = () => {
 	const navigate = useNavigate();
 	const params = useParams();
-	const {
-		playlistRef,
-		isShowMenu,
-		anchorPoints,
-		selectedURI,
-		selectedID,
-		handleOptionClick,
-	} = useContextMenu();
+	const { playlistRef, isShowMenu, anchorPoints, selected, handleOptionClick } =
+		useContextMenu();
 
 	// const playlists = useSelector((state: RootState) => state.playlist.playlists);
 
@@ -101,11 +95,7 @@ const Playlist = () => {
 	return (
 		<div className='col-span-10' id='scrollableDiv'>
 			{isShowMenu && (
-				<ContextMenu
-					anchorPoints={anchorPoints}
-					uri={selectedURI}
-					songID={selectedID}
-				/>
+				<ContextMenu anchorPoints={anchorPoints} selected={selected} />
 			)}
 
 			{playlist.isLoading === true ? (
@@ -250,7 +240,10 @@ const Playlist = () => {
 															onClick={(e: React.MouseEvent<HTMLDivElement>) =>
 																handleOptionClick(
 																	track.id,
+																	track.artists[0].id,
+																	track.album.id,
 																	track.uri,
+																	playlist.isSavedList[index],
 																	e,
 																	menuRef,
 																	optionRef

@@ -17,14 +17,8 @@ const SavedSongs = () => {
 	const navigate = useNavigate();
 	const dispatch = useDispatch();
 
-	const {
-		playlistRef,
-		isShowMenu,
-		anchorPoints,
-		selectedURI,
-		selectedID,
-		handleOptionClick,
-	} = useContextMenu();
+	const { playlistRef, isShowMenu, anchorPoints, selected, handleOptionClick } =
+		useContextMenu();
 
 	const { total } = useSelector((rootState: RootState) => rootState.tracks);
 
@@ -55,11 +49,7 @@ const SavedSongs = () => {
 	return (
 		<div className='col-span-10'>
 			{isShowMenu && (
-				<ContextMenu
-					anchorPoints={anchorPoints}
-					uri={selectedURI}
-					songID={selectedID}
-				/>
+				<ContextMenu anchorPoints={anchorPoints} selected={selected} />
 			)}
 
 			<Banner
@@ -186,7 +176,10 @@ const SavedSongs = () => {
 												onClick={(e: React.MouseEvent<HTMLDivElement>) => {
 													handleOptionClick(
 														track.id,
+														track.artists[0].id,
+														track.album.id,
 														track.uri,
+														true,
 														e,
 														menuRef!,
 														optionRef!

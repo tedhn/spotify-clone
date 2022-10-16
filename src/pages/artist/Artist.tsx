@@ -19,14 +19,8 @@ const Artist = () => {
 	const navigate = useNavigate();
 	const params = useParams();
 
-	const {
-		playlistRef,
-		isShowMenu,
-		anchorPoints,
-		selectedURI,
-		selectedID,
-		handleOptionClick,
-	} = useContextMenu();
+	const { playlistRef, isShowMenu, anchorPoints, selected, handleOptionClick } =
+		useContextMenu();
 
 	const [artist, setArtist] = useState<{
 		artistData: ArtistType | undefined;
@@ -81,11 +75,7 @@ const Artist = () => {
 	return (
 		<div className='col-span-10'>
 			{isShowMenu && (
-				<ContextMenu
-					anchorPoints={anchorPoints}
-					uri={selectedURI}
-					songID={selectedID}
-				/>
+				<ContextMenu anchorPoints={anchorPoints} selected={selected} />
 			)}
 			{artist.isLoading ? (
 				<Loading />
@@ -175,7 +165,10 @@ const Artist = () => {
 														onClick={(e: React.MouseEvent<HTMLDivElement>) =>
 															handleOptionClick(
 																track.id,
+																track.artists[0].id,
+																track.album.id,
 																track.uri,
+																artist.isSavedList[index],
 																e,
 																menuRef,
 																optionRef
